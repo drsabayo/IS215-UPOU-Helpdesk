@@ -15,7 +15,7 @@ Our students basically study their lessons from UP-designed learning materials w
 
 The key features of DE as practiced at UPOU are:
 
--Students and teachers are physically separated from each other.They do not meet face-to-face in a physical classroom.
--Students undertake guided independent study of carefully selected as well as specially designed learning materials in various media — print, video, and multimedia.
--Interaction between teachers and students, and among students, takes place through online tutorials in a virtual classroom. Other forms of communication between teacher and student are email, text, and teleconferencing.
--Midterm and Final examinations are usually administered through a network of examination venues here and abroad or through an online exam system.
+- Students and teachers are physically separated from each other.They do not meet face-to-face in a physical classroom.
+- Students undertake guided independent study of carefully selected as well as specially designed learning materials in various media — print, video, and multimedia.
+- Interaction between teachers and students, and among students, takes place through online tutorials in a virtual classroom. Other forms of communication between teacher and student are email, text, and teleconferencing.
+- Midterm and Final examinations are usually administered through a network of examination venues here and abroad or through an online exam system.
