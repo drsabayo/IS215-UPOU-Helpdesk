@@ -24,3 +24,6 @@ Specifically, the UP Open University has the following goals:
 To provide opportunities for alternative access to quality higher education by offering baccalaureate and post-baccalaureate degree programs and non-formal courses by distance education.
 To develop a system of continuing education for sustaining professional growth and improving technical skills especially for those who cannot leave their jobs or homes for full-time studies; and
 To contribute towards upgrading the quality of residential instruction in the University and the educational system of the country, in general, by developing, testing and utilizing innovative instructional materials and technology, and sharing these with other colleges and universities through cooperative programs.
+
+## The UP Open University Headquarters
+![The UP Open University Headquarters](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/48048146600/original/9lPCGBacyt7EP2U0WSm7lFg00UmlM6edNQ.png?1594197954)
