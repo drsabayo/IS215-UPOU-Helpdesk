@@ -1,4 +1,4 @@
-# UPOU Vision, Mission, and Objectives Print
+# UPOU Vision, Mission, and Objectives
 *Modified on: Wed, Jul 8, 2020 at 4:46 PM*
 
 The University of the Philippines Open University (UPOU) was designed to address the demand for quality and accessible higher education especially in areas which are not reached by the other campuses of UP.
