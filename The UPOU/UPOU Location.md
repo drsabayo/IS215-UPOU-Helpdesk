@@ -16,3 +16,10 @@ If your inquiry or concern is not related to admission, registration, or other s
 
 
 To get to the UPOU HQ:
+![UPOU HQ](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/48048119986/original/dULoa9fV0KUlvqkT0SRvr5dor0ocm3Zhrw.jpg?1594188144)
+
+![UPOU HQ](https://s3.amazonaws.com/cdn.freshdesk.com/data/helpdesk/attachments/production/48048120124/original/-rrSfSgtlb3OntOAhiZ8dV-qnbfdzGkGRQ.jpg?1594188204)
+
+
+If you are referring to UPOU's Mega Learning Hubs, please refer to this solution article: UPOU Mega Learning Hubs
+
