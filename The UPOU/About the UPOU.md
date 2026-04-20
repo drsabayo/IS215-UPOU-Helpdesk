@@ -1,5 +1,5 @@
 # About the University of the Philippines Open University Print
-### Modified on: Mon, Mar 8, 2021 at 2:27 PM
+Modified on: Mon, Mar 8, 2021 at 2:27 PM
 
 Established on 23 February 1995, the University of the Philippines Open University (UPOU) pioneered in online teaching and learning and continues to play a leading role in the study and practice of open learning and distance education in the Philippines. UPOU is the fifth autonomous campus of the UP System.
 
