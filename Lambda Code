@@ -1,0 +1,117 @@
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+
+const s3 = new S3Client({});
+const BUCKET_NAME = process.env.BUCKET;
+
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const OPENAI_ENDPOINT = "https://is215-openai.upou.io/v1/chat/completions";
+
+const streamToString = async (stream) =>
+  await new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () =>
+      resolve(Buffer.concat(chunks).toString("utf-8"))
+    );
+  });
+
+async function getS3Text(bucket, key) {
+  const command = new GetObjectCommand({ Bucket: bucket, Key: key });
+  const response = await s3.send(command);
+  return await streamToString(response.Body);
+}
+
+export const handler = async (event) => {
+  // Handle CORS preflight
+  if (event.requestContext?.http?.method === "OPTIONS" || event.httpMethod === "OPTIONS") {
+    return {
+      statusCode: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "content-type,authorization",
+        "Access-Control-Allow-Methods": "POST,OPTIONS",
+      },
+      body: "",
+    };
+  }
+
+  try {
+    let body;
+    if (event.body) {
+      body = JSON.parse(event.body);
+    } else {
+      body = event;
+    }
+
+    const question = body.question.toLowerCase();
+
+    let file_key = "about.md";
+    if (question.includes("exam")) {
+      file_key = "upou_examination_services.md";
+    } else if (question.includes("faculty")) {
+      file_key = "upou_faculty_studies.md";
+    } else if (question.includes("course")) {
+      file_key = "course_dev_upou.md";
+    } else if (question.includes("teaching")) {
+      file_key = "mode_teaching_upou.md";
+    } else if (question.includes("distance") || question.includes("elearning")) {
+      file_key = "open_distance_elearning.md";
+    } else if (question.includes("law") || question.includes("ra10650")) {
+      file_key = "ra10650.md";
+    } else if (question.includes("citizen")) {
+      file_key = "upou_citizen_charter.md";
+    }
+
+    const context = await getS3Text(BUCKET_NAME, file_key);
+
+    const response = await fetch(OPENAI_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a UPOU Helpdesk Assistant. Answer ONLY using the provided context. If not found, say you don't know.",
+          },
+          {
+            role: "user",
+            content: `Context:\n${context}\n\nQuestion:\n${question}`,
+          },
+        ],
+        max_tokens: 300,
+      }),
+    });
+
+    const data = await response.json();
+
+    // Defensive check
+    if (!data.choices || !data.choices[0]) {
+      console.error("Unexpected OpenAI response:", JSON.stringify(data));
+      return {
+        statusCode: 200,
+        headers: { "Access-Control-Allow-Origin": "*" },
+        body: JSON.stringify({ answer: data.error?.message || "Unexpected API response: " + JSON.stringify(data) }),
+      };
+    }
+
+    return {
+      statusCode: 200,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ answer: data.choices[0].message.content }),
+    };
+
+  } catch (error) {
+    console.error("ERROR:", error);
+    return {
+      statusCode: 500,
+      headers: { "Access-Control-Allow-Origin": "*" },
+      body: JSON.stringify({ error: error.message || "Something went wrong" }),
+    };
+  }
+};
