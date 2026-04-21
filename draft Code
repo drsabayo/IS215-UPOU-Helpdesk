@@ -1,0 +1,118 @@
+import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
+
+const s3 = new S3Client({});
+const BUCKET_NAME = "is215-project-drsabayo";
+
+// helper: stream → string
+const streamToString = async (stream) => {
+  return await new Promise((resolve, reject) => {
+    const chunks = [];
+    stream.on("data", (chunk) => chunks.push(chunk));
+    stream.on("error", reject);
+    stream.on("end", () => resolve(Buffer.concat(chunks).toString("utf-8")));
+  });
+};
+
+export const handler = async (event) => {
+  const question = (event.question || "").toLowerCase();
+
+  let fileKey;
+
+  // 🔍 Retrieval logic
+  if (question.includes("exam") || question.includes("examination")) {
+    fileKey = "faqs_examination_services.md";
+  } else if (question.includes("admission") || question.includes("apply")) {
+    fileKey = "faqs_admissions.md";
+  } else {
+    fileKey = "about.md";
+  }
+
+  try {
+    // ✅ STEP 1: Get context from S3
+    const command = new GetObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: fileKey,
+    });
+
+    const response = await s3.send(command);
+    const contextText = await streamToString(response.Body);
+
+    // ✅ STEP 2: Call OpenAI (no install needed)
+    const aiResponse = await fetch("https://is215-openai.upou.io/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `
+You are a professional UPOU Helpdesk Assistant.
+
+STRICT RULES:
+- Only answer using the provided context.
+- Do NOT make up information.
+- If the answer is NOT in the context, respond EXACTLY with:
+"I'm sorry, I cannot find that information in the official documentation. I can create a support ticket for you."
+
+Be polite, clear, and concise.
+            `
+          },
+          {
+            role: "user",
+            content: `
+Context:
+${contextText}
+
+Question:
+${question}
+            `
+          }
+        ],
+        temperature: 0.2
+      })
+    });
+
+    const data = await aiResponse.json();
+
+console.log("🔍 OpenAI response:", JSON.stringify(data));
+
+if (!data.choices) {
+  throw new Error("OpenAI API error: " + JSON.stringify(data));
+}
+
+const aiAnswer = data.choices[0].message.content;
+
+    // 🎯 STEP 3: Detect "I don't know"
+    let ticketCreated = false;
+
+    if (aiAnswer.includes("cannot find that information")) {
+      ticketCreated = true;
+
+      // (Basic simulation for now — can upgrade to DynamoDB/SES later)
+      console.log("📩 Ticket created for question:", question);
+    }
+
+    // ✅ FINAL RESPONSE
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        answer: aiAnswer,
+        source: "Official Policy",
+        file_used: fileKey,
+        ticket_created: ticketCreated
+      }),
+    };
+
+  } catch (error) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        error: error.message,
+      }),
+    };
+  }
+};
