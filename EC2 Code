@@ -1,0 +1,22 @@
+async function ask() {
+  const question = document.getElementById("question").value;
+
+  try {
+    const res = await fetch("https://tlh5dt3zn5.execute-api.us-east-1.amazonaws.com/default/is215-project-drsabayo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ question })
+    });
+
+    const data = await res.json();
+    console.log("Response:", data);
+
+    document.getElementById("answer").innerText = data.answer || data.error || "No answer returned";
+
+  } catch (error) {
+    console.error("ERROR:", error);
+    document.getElementById("answer").innerText = "Error connecting to API";
+  }
+}
